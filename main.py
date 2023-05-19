@@ -1,7 +1,6 @@
 from database import collection1, collection2
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from bson import ObjectId
-import Request
 
 # app object
 app = FastAPI(debug=True)
