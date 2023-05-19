@@ -48,16 +48,11 @@ async def get_allfiles(user: dict):
 
 
 @app.post("/upload")
-async def upload_file(user: dict,file: dict):
-    
+async def upload_file(request: Request):
     try:
-        user_result = await collection1.find_one({"_id": ObjectId(user["_id"])})
-        if user_result is not None and "file_ids" in user_result:
-            file_result = await collection2.insert_one({"name": file["name"],"data":file["data"]})
-            await collection1.update_one({"_id":ObjectId(user["_id"])}, {"$push": {"file_ids": file_result.inserted_id}})
-            return {"file_id": str(file_result.inserted_id), "name": file["name"]}
-        else:
-            return {"error": "user not exist"}
+        file = request.json()
+        file_result = await collection2.insert_one({"name": file["name"],"data":file["data"]})
+        return {"file_id": str(file_result.inserted_id)}
     except Exception as e:
         return {"error": str(e)}
 
