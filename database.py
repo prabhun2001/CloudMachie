@@ -1,7 +1,7 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 
 try:
-    client = AsyncIOMotorClient("mongodb://localhost:27017")
+    client = AsyncIOMotorClient("mongodb://23.21.228.145:27017")
 
     # Access database and collection
     database = client.clouddata
