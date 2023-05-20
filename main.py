@@ -1,4 +1,4 @@
-from database import collection1, collection2
+from database import collection2
 from fastapi import FastAPI, Request
 from bson import ObjectId 
 from crypto_graphy.signature_decryption import decrypt_signature
