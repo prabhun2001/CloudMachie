@@ -51,11 +51,11 @@ async def get_allfiles(user: dict):
 @app.post("/upload")
 async def upload_file(request: Request):
     try:
-        file = await request.json()
+        data = await request.json()
         signature = request.headers.get("Signature")
 
         if decrypt_signature(signature):
-            file_result = await collection2.insert_one({"filename": file["name"],"content": file["content"],"authorized_users": file["authorized_users"]})
+            file_result = await collection2.insert_one({"filename": data["filename"],"content": data["content"],"authorized_users": data["authorized_users"]})
             return {"file_id": str(file_result.inserted_id)}
     except Exception as e:
         return {"error": str(e)}
