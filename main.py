@@ -1,6 +1,7 @@
 from database import collection1, collection2
 from fastapi import FastAPI, Request
-from bson import ObjectId
+from bson import ObjectId 
+from crypto_graphy.signature_decryption import decrypt_signature
 
 # app object
 app = FastAPI(debug=True)
@@ -51,8 +52,11 @@ async def get_allfiles(user: dict):
 async def upload_file(request: Request):
     try:
         file = await request.json()
-        file_result = await collection2.insert_one({"name": file["name"],"data":file["data"]})
-        return {"file_id": str(file_result.inserted_id)}
+        signature = request.headers.get("Signature")
+
+        if decrypt_signature(signature):
+            file_result = await collection2.insert_one({"filename": file["name"],"content": file["content"],"authorized_users": file["authorized_users"]})
+            return {"file_id": str(file_result.inserted_id)}
     except Exception as e:
         return {"error": str(e)}
 
