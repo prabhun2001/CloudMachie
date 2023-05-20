@@ -53,6 +53,9 @@ async def upload_file(request: Request):
     try:
         data = await request.json()
         signature = request.headers.get("Signature")
+        print(signature)
+        print("ssssssssssssssssssssssssssssssssssssssss")
+        print(decrypt_signature(signature))
 
         if decrypt_signature(signature):
             file_result = await collection2.insert_one({"filename": data["filename"],"content": data["content"],"authorized_users": data["authorized_users"]})
