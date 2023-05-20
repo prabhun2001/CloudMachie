@@ -63,6 +63,34 @@ async def upload_file(request: Request):
     except Exception as e:
         return {"error": str(e)}
 
+
+@app.post("/getfiles")
+async def get_all_files(request: Request):
+    try:
+        signature = request.headers.get("Signature")
+        decrypted_signature = decrypt_signature(signature)
+        user_id = decrypted_signature.split("+")[0]
+        print(user_id)
+
+        if decrypted_signature:
+            files = await collection2.find().to_list(length=None)
+            serialized_files = []
+            for file in files:
+                authorized_users = file["authorized_users"]
+                if user_id in authorized_users:
+                    serialized_file = {
+                        "filename": file["filename"],
+                        "file_id": str(file["_id"])
+                    }
+                    serialized_files.append(serialized_file)
+
+            return {"files": serialized_files}
+        else:
+            return {"error": "failed decryptoin"}
+    except Exception as e:
+        return {"error": str(e)}
+
+
 @app.post("/getfile")
 async def get_file(user: dict, file: dict):
 
