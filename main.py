@@ -11,42 +11,42 @@ app = FastAPI(debug=True)
 async def read_root():
     return {"Hello": "World"}
 
-@app.post("/signup")
-async def create_user(user: dict):
+# @app.post("/signup")
+# async def create_user(user: dict):
 
-    try:
-        user1 = {
-            "_id": ObjectId(user["_id"]),
-            "password": user["password"] ,
-            "dob": user["dob"],
-            "file_ids": []
-        }
+#     try:
+#         user1 = {
+#             "_id": ObjectId(user["_id"]),
+#             "password": user["password"] ,
+#             "dob": user["dob"],
+#             "file_ids": []
+#         }
 
-        result = await collection1.insert_one(user1)
+#         result = await collection1.insert_one(user1)
 
-        return {"message": "User created successfully", "user_id": str(result.inserted_id)}
-    except Exception as e:
-        return {"error": str(e)}
+#         return {"message": "User created successfully", "user_id": str(result.inserted_id)}
+#     except Exception as e:
+#         return {"error": str(e)}
 
-@app.post("/login")
-async def get_allfiles(user: dict):
+# @app.post("/login")
+# async def get_allfiles(user: dict):
 
-    try:
-        result = await collection1.find_one({"_id": ObjectId(user["_id"])})
-        if result is not None and "file_ids" in result:
-            files = {"all_files": []}
-            for id in result["file_ids"]:
-                file_result = await collection2.find_one({"_id": id})
-                if file_result:
-                    files["all_files"].append({"file_id": str(file_result["_id"]), "name": file_result["name"]})
-                else:
-                    return {"error": "file missing"}
-            return files
-        else:
-            return {"message": "Document or field not found"}
+#     try:
+#         result = await collection1.find_one({"_id": ObjectId(user["_id"])})
+#         if result is not None and "file_ids" in result:
+#             files = {"all_files": []}
+#             for id in result["file_ids"]:
+#                 file_result = await collection2.find_one({"_id": id})
+#                 if file_result:
+#                     files["all_files"].append({"file_id": str(file_result["_id"]), "name": file_result["name"]})
+#                 else:
+#                     return {"error": "file missing"}
+#             return files
+#         else:
+#             return {"message": "Document or field not found"}
     
-    except Exception as e:
-        return {"error": str(e)}
+#     except Exception as e:
+#         return {"error": str(e)}
 
 
 @app.post("/upload")
@@ -86,23 +86,26 @@ async def get_all_files(request: Request):
 
             return {"files": serialized_files}
         else:
-            return {"error": "failed decryptoin"}
+            return {"error": "signature not valid"}
     except Exception as e:
         return {"error": str(e)}
 
 
 @app.post("/getfile")
-async def get_file(user: dict, file: dict):
-
+async def get_file(request: Request):
     try:
-        user_result = await collection1.find_one({"_id": ObjectId(user["_id"])})
-        if user_result is not None:
-            file_result = await collection2.find_one({"_id": ObjectId(file["_id"])})
-            if file_result is not None:
-                return {"name": file_result['name'], "data": file_result["data"]}
-            else: 
-                return {"error": "file not exist"}
+        signature = request.headers.get("Signature")
+        decrypted_signature = decrypt_signature(signature)
+        file_id = decrypted_signature.split("+")[2]
+        print(file_id)
+
+        if decrypted_signature:
+            result = await collection2.find_one({"_id": ObjectId(file_id)})
+            if result is not None:
+                return {"content": result["content"]}
+            else:
+                return {"error": "file not exist in storage!!!"}
         else:
-            return {"error": "user not exist or file not exist"}
+            return {"error": "signature not valid"}
     except Exception as e:
         return {"error": str(e)}
