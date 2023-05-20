@@ -3,7 +3,7 @@ from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from cryptography.hazmat.backends import default_backend
 import base64, os
 
-def decrypt_signature(encrypted_data, private_key_path = "crypto_graphy\private_key.pem"):
+def decrypt_signature(encrypted_data, private_key_path = "crypto_graphy/private_key.pem"):
 
     # Decode the Base64-encoded encrypted data
     encrypted_data = base64.b64decode(encrypted_data)
