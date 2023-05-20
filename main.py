@@ -50,7 +50,7 @@ async def get_allfiles(user: dict):
 @app.post("/upload")
 async def upload_file(request: Request):
     try:
-        file = request.json()
+        file = await request.json()
         file_result = await collection2.insert_one({"name": file["name"],"data":file["data"]})
         return {"file_id": str(file_result.inserted_id)}
     except Exception as e:
