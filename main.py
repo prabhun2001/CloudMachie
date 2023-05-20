@@ -57,6 +57,8 @@ async def upload_file(request: Request):
         if decrypt_signature(signature):
             file_result = await collection2.insert_one({"filename": data["filename"],"content": data["content"],"authorized_users": data["authorized_users"]})
             return {"file_id": str(file_result.inserted_id)}
+        else:
+            return {"error": "failed decryptoin"}
     except Exception as e:
         return {"error": str(e)}
 
