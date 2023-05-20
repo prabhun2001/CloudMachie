@@ -25,8 +25,3 @@ def decrypt_signature(encrypted_data, private_key_path = "crypto_graphy/private_
     )
     
     return decrypted_data.decode("utf-8")
-
-text = "IDivPFVgTKcEMBWLZvf4wRtN4zSo9C5N4JcLSUj0NwOsaxTgz5yLPeMA4rbwnYA0noQC87o+SrUXfA2BgqYLVtI3TnU7yD10102lzvSpciu/qO4wQ88NzwEMbaKBdiysU20SkUOBAA8JtoLL5VQ64MwXMqf1kH/wWcG2b0XnnvCmYTRP6VgcgxCKgQrxqYgjloD06TmRPjQECX/kmxijUzK8nWGbJs+EkTk118PW16XbzKXrJ8aRKFyrAhZyDo/+h5PAOo15WLVY4pMDVtMmxqy188JkDGSelMKYGbK/1ARZNqwsBuvH7WDGtnh9xkXTHsfIp61zXfTiXlzsNomIFA=="
-
-x=decrypt_signature(text)
-print(x)
