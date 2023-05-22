@@ -109,3 +109,43 @@ async def get_file(request: Request):
             return {"error": "signature not valid"}
     except Exception as e:
         return {"error": str(e)}
+
+@app.post("/delete")
+async def get_file(request: Request):
+    try:
+        signature = request.headers.get("Signature")
+        decrypted_signature = decrypt_signature(signature)
+        file_id = decrypted_signature.split("+")[2]
+        user_id = decrypted_signature.split("+")[0]
+        print(file_id)
+        print(user_id)
+
+        if decrypted_signature:
+            result = await collection2.find_one({"_id": ObjectId(file_id)})
+            if result is not None:
+                # Get the authorized users list
+                authorized_users = result.get("authorized_users", [])
+                # Check if the user's ID is in the authorized users list
+                if user_id in authorized_users:
+                    # Remove the user from the authorized users list
+                    authorized_users.remove(user_id)
+
+                    # If the authorized users list becomes empty, delete the file
+                    if len(authorized_users) == 0:
+                        await collection2.delete_one({"_id": ObjectId(file_id)})
+                    else:
+                        # Update the authorized users list in the database
+                        await collection2.update_one(
+                            {"_id": ObjectId(file_id)},
+                            {"$set": {"authorized_users": authorized_users}}
+                        )
+                    return {"status": "deleted"}
+
+                else:
+                    return {"error": "user not found"}
+            else:
+                return {"error": "file not exist in storage!!!"}
+        else:
+            return {"error": "signature not valid"}
+    except Exception as e:
+        return {"error": str(e)}
