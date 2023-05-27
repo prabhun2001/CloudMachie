@@ -149,3 +149,22 @@ async def delete_file(request: Request):
             return {"error": "signature not valid"}
     except Exception as e:
         return {"error": str(e)}
+
+@app.post("/deletefile")
+async def get_file(request: Request):
+    try:
+        signature = request.headers.get("Signature")
+        decrypted_signature = decrypt_signature(signature)
+        file_id = decrypted_signature.split("+")[2]
+        print(file_id)
+
+        if decrypted_signature:
+            result = await collection2.find_one({"_id": ObjectId(file_id)})
+            if result is not None:
+                return {"filename": result["filename"],"content": result["content"]}
+            else:
+                return {"error": "file not exist in storage!!!"}
+        else:
+            return {"error": "signature not valid"}
+    except Exception as e:
+        return {"error": str(e)}
